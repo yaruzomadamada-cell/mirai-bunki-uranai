@@ -2,7 +2,7 @@ import "server-only";
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { getSupabaseAdmin } from "./supabase-admin";
+import { getSupabaseAdmin, getSupabaseConfigStatus } from "./supabase-admin";
 import type { FortuneResultRecord, PaymentRecord } from "./types";
 
 const dataDir = path.join(process.cwd(), "data");
@@ -27,6 +27,14 @@ async function writeLocalStore(store: LocalStore): Promise<void> {
   await writeFile(localStoreFile, JSON.stringify(store, null, 2), "utf8");
 }
 
+function canUseLocalStore(): boolean {
+  return !process.env.VERCEL;
+}
+
+function createSupabaseUnavailableError(operation: string): Error {
+  return new Error(`${operation}: Supabase admin client is unavailable. ${JSON.stringify(getSupabaseConfigStatus())}`);
+}
+
 export async function createFortuneResult(
   record: Omit<FortuneResultRecord, "id" | "created_at" | "paid" | "stripe_session_id">,
 ): Promise<FortuneResultRecord> {
@@ -42,10 +50,16 @@ export async function createFortuneResult(
       .single();
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error(
+        `Supabase insert fortune_results failed: ${error.message}. ${JSON.stringify(getSupabaseConfigStatus())}`,
+      );
     }
 
     return data as FortuneResultRecord;
+  }
+
+  if (!canUseLocalStore()) {
+    throw createSupabaseUnavailableError("createFortuneResult");
   }
 
   const store = await readLocalStore();
@@ -71,6 +85,10 @@ export async function getFortuneResult(id: string): Promise<FortuneResultRecord 
     return data as FortuneResultRecord;
   }
 
+  if (!canUseLocalStore()) {
+    throw createSupabaseUnavailableError("getFortuneResult");
+  }
+
   const store = await readLocalStore();
   return store.fortune_results.find((item) => item.id === id) ?? null;
 }
@@ -86,6 +104,10 @@ export async function setCheckoutSession(resultId: string, sessionId: string): P
       throw new Error(error.message);
     }
     return;
+  }
+
+  if (!canUseLocalStore()) {
+    throw createSupabaseUnavailableError("setCheckoutSession");
   }
 
   const store = await readLocalStore();
@@ -109,6 +131,10 @@ export async function markResultPaid(resultId: string, sessionId?: string): Prom
     return;
   }
 
+  if (!canUseLocalStore()) {
+    throw createSupabaseUnavailableError("markResultPaid");
+  }
+
   const store = await readLocalStore();
   store.fortune_results = store.fortune_results.map((item) =>
     item.id === resultId ? { ...item, paid: true, stripe_session_id: sessionId ?? item.stripe_session_id } : item,
@@ -124,6 +150,10 @@ export async function insertPayment(payment: PaymentRecord): Promise<void> {
       throw new Error(error.message);
     }
     return;
+  }
+
+  if (!canUseLocalStore()) {
+    throw createSupabaseUnavailableError("insertPayment");
   }
 
   const store = await readLocalStore();

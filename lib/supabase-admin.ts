@@ -50,9 +50,19 @@ function cleanUrlEnvValue(name: string, value: string | undefined): string | und
   return (urlMatch?.[0] ?? cleaned).replace(/[),.;]+$/, "");
 }
 
+function cleanJwtEnvValue(name: string, value: string | undefined): string | undefined {
+  const cleaned = cleanEnvValue(name, value, true);
+  if (!cleaned) {
+    return undefined;
+  }
+
+  const jwtMatch = cleaned.match(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/);
+  return jwtMatch?.[0] ?? cleaned;
+}
+
 function readServiceRoleKey(): { key?: string; envName?: string } {
   for (const envName of serviceRoleEnvNames) {
-    const key = cleanEnvValue(envName, process.env[envName], true);
+    const key = cleanJwtEnvValue(envName, process.env[envName]);
     if (key) {
       return { key, envName };
     }
@@ -79,9 +89,23 @@ function decodeJwtRole(key: string | undefined): string | null {
   }
 }
 
+function isByteStringSafe(value: string | undefined): boolean {
+  if (!value) {
+    return false;
+  }
+
+  for (let index = 0; index < value.length; index += 1) {
+    if (value.charCodeAt(index) > 255) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export function getSupabaseConfigStatus() {
   const url = cleanUrlEnvValue("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
-  const anonKey = cleanEnvValue("NEXT_PUBLIC_SUPABASE_ANON_KEY", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, true);
+  const anonKey = cleanJwtEnvValue("NEXT_PUBLIC_SUPABASE_ANON_KEY", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const { key, envName } = readServiceRoleKey();
   let urlHost: string | null = null;
 
@@ -99,6 +123,7 @@ export function getSupabaseConfigStatus() {
     hasServiceRoleKey: Boolean(key),
     serviceRoleEnvName: envName ?? null,
     serviceKeyRole: decodeJwtRole(key),
+    serviceKeyByteStringSafe: isByteStringSafe(key),
     urlHost,
     runtime: process.env.VERCEL ? "vercel" : "local",
   };
@@ -109,6 +134,10 @@ export function getSupabaseAdmin(): SupabaseClient | null {
   const { key } = readServiceRoleKey();
 
   if (!url || !key) {
+    return null;
+  }
+
+  if (!isByteStringSafe(key)) {
     return null;
   }
 

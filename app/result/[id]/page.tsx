@@ -16,9 +16,20 @@ type ResultPageProps = {
 
 export async function generateMetadata({ params }: ResultPageProps): Promise<Metadata> {
   const { id } = await params;
-  const result = (await getFortuneResult(id)) ?? (await getFallbackFortuneResult(id));
+  const result = await getFortuneResult(id);
   if (!result) {
-    return { title: "鑑定結果が見つかりません" };
+    return {
+      title: "未来分岐鑑定結果",
+      description: "今の迷いに対して現れやすい3つの未来を読み解く、未来分岐占いの鑑定結果です。",
+      alternates: {
+        canonical: `/result/${id}`,
+      },
+      openGraph: {
+        title: "未来分岐鑑定結果",
+        description: "このまま進む未来、動いた未来、手放した未来を読み解きます。",
+        images: [{ url: "/og-image.svg", width: 1200, height: 630 }],
+      },
+    };
   }
 
   return {

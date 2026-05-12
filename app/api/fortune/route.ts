@@ -58,7 +58,12 @@ export async function POST(request: Request) {
       free_result: generated.freeResult,
       premium_result: generated.premiumResult,
     });
-  } catch {
+  } catch (error) {
+    console.error(
+      "Falling back to cookie fortune result because persistent storage failed:",
+      error instanceof Error ? error.message : "Unknown storage error",
+    );
+
     const fallbackPayload = {
       id: crypto.randomUUID(),
       nickname,

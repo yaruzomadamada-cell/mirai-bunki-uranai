@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { getFallbackFortuneResult } from "@/lib/fortune-cookie";
+import { getFortuneResultForRequest } from "@/lib/result-lookup";
 import { getStripe } from "@/lib/stripe";
-import { getFortuneResult, insertPayment, setCheckoutSession } from "@/lib/store";
+import { insertPayment, setCheckoutSession } from "@/lib/store";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
   const resultId = String(formData.get("resultId") ?? "");
-  const result = (await getFortuneResult(resultId)) ?? (await getFallbackFortuneResult(resultId));
+  const result = await getFortuneResultForRequest(resultId);
 
   if (!result) {
     return NextResponse.redirect(new URL("/fortune?error=not-found", request.url), { status: 303 });

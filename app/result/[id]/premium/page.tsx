@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { PremiumLockSection } from "@/components/PremiumLockSection";
 import { RelatedMenuSection } from "@/components/RelatedMenuSection";
 import { ResultHeader } from "@/components/ResultHeader";
+import { getFallbackFortuneResult } from "@/lib/fortune-cookie";
 import { getStripe } from "@/lib/stripe";
 import { getFortuneResult, insertPayment, markResultPaid } from "@/lib/store";
 
@@ -49,7 +50,7 @@ export default async function PremiumResultPage({ params, searchParams }: Premiu
   const { id } = await params;
   const query = await searchParams;
   await syncSessionIfPossible(id, query.session_id);
-  const result = await getFortuneResult(id);
+  const result = (await getFortuneResult(id)) ?? (await getFallbackFortuneResult(id));
 
   if (!result) {
     notFound();

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateFortune } from "@/lib/fortune";
+import { createFallbackRecord, setFallbackFortuneCookie } from "@/lib/fortune-cookie";
 import { situationOptions, themeLabels } from "@/lib/fortune-data";
 import { createFortuneResult } from "@/lib/store";
 import type { Gender, ThemeId } from "@/lib/types";
@@ -42,18 +43,35 @@ export async function POST(request: Request) {
     concern,
   });
 
-  const record = await createFortuneResult({
-    nickname,
-    birthdate,
-    gender,
-    theme,
-    situation,
-    concern: concern || null,
-    type_number: generated.typeNumber,
-    type_name: generated.typeName,
-    free_result: generated.freeResult,
-    premium_result: generated.premiumResult,
-  });
+  let record;
+
+  try {
+    record = await createFortuneResult({
+      nickname,
+      birthdate,
+      gender,
+      theme,
+      situation,
+      concern: concern || null,
+      type_number: generated.typeNumber,
+      type_name: generated.typeName,
+      free_result: generated.freeResult,
+      premium_result: generated.premiumResult,
+    });
+  } catch {
+    const fallbackPayload = {
+      id: crypto.randomUUID(),
+      nickname,
+      birthdate,
+      gender,
+      theme,
+      situation,
+      concern: concern || null,
+      created_at: new Date().toISOString(),
+    };
+    record = createFallbackRecord(fallbackPayload);
+    await setFallbackFortuneCookie(fallbackPayload);
+  }
 
   return NextResponse.redirect(new URL(`/result/${record.id}`, request.url), { status: 303 });
 }

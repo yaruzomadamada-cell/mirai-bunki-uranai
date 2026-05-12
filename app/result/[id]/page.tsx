@@ -6,6 +6,7 @@ import { RelatedMenuSection } from "@/components/RelatedMenuSection";
 import { ResultHeader } from "@/components/ResultHeader";
 import { ShareButton } from "@/components/ShareButton";
 import { TypeCard } from "@/components/TypeCard";
+import { getFallbackFortuneResult } from "@/lib/fortune-cookie";
 import { themeLabels, typeKeywords } from "@/lib/fortune-data";
 import { getFortuneResult } from "@/lib/store";
 
@@ -15,7 +16,7 @@ type ResultPageProps = {
 
 export async function generateMetadata({ params }: ResultPageProps): Promise<Metadata> {
   const { id } = await params;
-  const result = await getFortuneResult(id);
+  const result = (await getFortuneResult(id)) ?? (await getFallbackFortuneResult(id));
   if (!result) {
     return { title: "鑑定結果が見つかりません" };
   }
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: ResultPageProps): Promise<Met
 
 export default async function ResultPage({ params }: ResultPageProps) {
   const { id } = await params;
-  const result = await getFortuneResult(id);
+  const result = (await getFortuneResult(id)) ?? (await getFallbackFortuneResult(id));
 
   if (!result) {
     notFound();

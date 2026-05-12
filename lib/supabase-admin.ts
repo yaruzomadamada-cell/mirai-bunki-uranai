@@ -40,6 +40,16 @@ function cleanEnvValue(name: string, value: string | undefined, removeWhitespace
   return cleaned || undefined;
 }
 
+function cleanUrlEnvValue(name: string, value: string | undefined): string | undefined {
+  const cleaned = cleanEnvValue(name, value);
+  if (!cleaned) {
+    return undefined;
+  }
+
+  const urlMatch = cleaned.match(/https?:\/\/[^\s'"<>]+/);
+  return (urlMatch?.[0] ?? cleaned).replace(/[),.;]+$/, "");
+}
+
 function readServiceRoleKey(): { key?: string; envName?: string } {
   for (const envName of serviceRoleEnvNames) {
     const key = cleanEnvValue(envName, process.env[envName], true);
@@ -70,7 +80,7 @@ function decodeJwtRole(key: string | undefined): string | null {
 }
 
 export function getSupabaseConfigStatus() {
-  const url = cleanEnvValue("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const url = cleanUrlEnvValue("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
   const anonKey = cleanEnvValue("NEXT_PUBLIC_SUPABASE_ANON_KEY", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, true);
   const { key, envName } = readServiceRoleKey();
   let urlHost: string | null = null;
@@ -95,10 +105,19 @@ export function getSupabaseConfigStatus() {
 }
 
 export function getSupabaseAdmin(): SupabaseClient | null {
-  const url = cleanEnvValue("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const url = cleanUrlEnvValue("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
   const { key } = readServiceRoleKey();
 
   if (!url || !key) {
+    return null;
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+      return null;
+    }
+  } catch {
     return null;
   }
 

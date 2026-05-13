@@ -28,13 +28,15 @@ export async function POST(request: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const resultId = session.metadata?.fortune_result_id;
+    const resultId = session.metadata?.resultId ?? session.metadata?.fortune_result_id;
 
     if (resultId) {
       await markResultPaid(resultId, session.id);
       await insertPayment({
         fortune_result_id: resultId,
         stripe_session_id: session.id,
+        provider: "stripe",
+        provider_payment_id: session.id,
         amount: session.amount_total ?? 980,
         currency: session.currency ?? "jpy",
         status: session.payment_status ?? "paid",

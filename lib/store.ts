@@ -146,6 +146,21 @@ export async function insertPayment(payment: PaymentRecord): Promise<void> {
   const supabase = getSupabaseAdmin();
   if (supabase) {
     const { error } = await supabase.from("payments").insert(payment);
+    if (error && (error.code === "PGRST204" || error.message.includes("provider"))) {
+      const { error: legacyError } = await supabase.from("payments").insert({
+        fortune_result_id: payment.fortune_result_id,
+        stripe_session_id: payment.stripe_session_id ?? payment.provider_payment_id ?? null,
+        amount: payment.amount,
+        currency: payment.currency,
+        status: payment.status,
+      });
+
+      if (legacyError) {
+        throw new Error(legacyError.message);
+      }
+      return;
+    }
+
     if (error) {
       throw new Error(error.message);
     }

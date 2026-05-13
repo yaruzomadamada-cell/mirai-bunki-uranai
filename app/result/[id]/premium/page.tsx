@@ -39,6 +39,8 @@ async function syncSessionIfPossible(resultId: string, sessionId?: string) {
     await insertPayment({
       fortune_result_id: resultId,
       stripe_session_id: session.id,
+      provider: "stripe",
+      provider_payment_id: session.id,
       amount: session.amount_total ?? 980,
       currency: session.currency ?? "jpy",
       status: session.payment_status,
@@ -131,7 +133,7 @@ export default async function PremiumResultPage({ params, searchParams }: Premiu
         />
 
         {!result.paid ? (
-          <PremiumLockSection resultId={result.id} showStripeError={query.error === "stripe-unconfigured"} />
+          <PremiumLockSection resultId={result.id} error={query.error} showStripeError={query.error === "stripe-unconfigured"} />
         ) : (
           <>
             <section className="mt-6 grid gap-4">

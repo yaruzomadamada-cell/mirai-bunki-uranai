@@ -81,7 +81,9 @@ export type FortuneResultRecord = {
 
 export type PaymentRecord = {
   fortune_result_id: string;
-  stripe_session_id: string;
+  stripe_session_id?: string | null;
+  provider?: "stripe" | "komoju";
+  provider_payment_id?: string | null;
   amount: number;
   currency: string;
   status: string;

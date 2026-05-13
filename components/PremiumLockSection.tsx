@@ -1,12 +1,13 @@
-import { CheckoutButton } from "./CheckoutButton";
+import { PaymentMethodSelector } from "./PaymentMethodSelector";
 import { premiumPreviewItems } from "@/lib/fortune-data";
 
 type PremiumLockSectionProps = {
   resultId: string;
+  error?: string;
   showStripeError?: boolean;
 };
 
-export function PremiumLockSection({ resultId, showStripeError = false }: PremiumLockSectionProps) {
+export function PremiumLockSection({ resultId, error, showStripeError = false }: PremiumLockSectionProps) {
   return (
     <section className="mt-8 overflow-hidden rounded-lg border border-gold/38 bg-[#FFF8EE] shadow-soft">
       <div className="border-b border-gold/24 bg-white px-5 py-6 sm:px-8">
@@ -46,7 +47,7 @@ export function PremiumLockSection({ resultId, showStripeError = false }: Premiu
           ))}
         </div>
         <div className="mt-6">
-          <CheckoutButton resultId={resultId} />
+          <PaymentMethodSelector resultId={resultId} error={error} showStripeError={showStripeError} />
         </div>
       </div>
     </section>

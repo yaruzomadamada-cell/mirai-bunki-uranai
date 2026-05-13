@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getFortuneResultForRequest } from "@/lib/result-lookup";
+import { getSiteUrl } from "@/lib/site";
 import { getStripe } from "@/lib/stripe";
 import { insertPayment, setCheckoutSession } from "@/lib/store";
 
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
     });
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(request.url).origin;
+  const siteUrl = getSiteUrl(request.url);
   const lineItem = process.env.STRIPE_PRICE_ID
     ? {
         price: process.env.STRIPE_PRICE_ID,
@@ -42,6 +43,7 @@ export async function POST(request: Request) {
     success_url: `${siteUrl}/result/${result.id}/premium?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${siteUrl}/result/${result.id}`,
     metadata: {
+      resultId: result.id,
       fortune_result_id: result.id,
     },
   });
@@ -50,6 +52,8 @@ export async function POST(request: Request) {
   await insertPayment({
     fortune_result_id: result.id,
     stripe_session_id: session.id,
+    provider: "stripe",
+    provider_payment_id: session.id,
     amount: 980,
     currency: "jpy",
     status: "created",

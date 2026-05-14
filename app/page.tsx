@@ -151,7 +151,7 @@ export default function Home() {
 
       <section className="bg-[#fffdf8] px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-4xl">
-          <FAQSection items={faqItems} />
+          <FAQSection items={faqItems} title="よくある質問" />
         </div>
       </section>
     </main>

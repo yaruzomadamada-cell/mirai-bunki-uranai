@@ -4,14 +4,16 @@ import { themeLabels } from "@/lib/fortune-data";
 import type { ThemeId } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "無料鑑定フォーム",
-  description: "あなたの今の迷いを教えてください。生年月日と今の状況から、3つの未来分岐を無料で占います。",
+  title: "無料鑑定フォーム｜未来分岐占いで3つの未来を占う",
+  description:
+    "恋愛・復縁・仕事・人生の迷いに。生年月日と今の状況から、このまま進む未来・動いた未来・手放した未来を無料鑑定します。",
   alternates: {
     canonical: "/fortune",
   },
   openGraph: {
-    title: "無料で未来分岐を占う",
-    description: "恋愛、復縁、仕事、人生の迷いに。3つの未来分岐を無料で占います。",
+    title: "無料鑑定フォーム｜未来分岐占い",
+    description:
+      "今の選択から3つの未来を無料で鑑定します。恋愛・復縁・仕事・人生の迷いをやさしく整理します。",
     images: [{ url: "/og-image.svg", width: 1200, height: 630 }],
   },
 };

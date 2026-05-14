@@ -8,16 +8,16 @@ import { PremiumIntroSection } from "@/components/PremiumIntroSection";
 import { RankingSection } from "@/components/RankingSection";
 
 export const metadata: Metadata = {
-  title: "未来分岐占い｜今の選択で変わる3つの未来を無料診断",
+  title: "未来分岐占い｜今の選択から3つの未来を無料鑑定",
   description:
-    "恋愛、復縁、仕事、人生の迷いに。生年月日と今の悩みから「このまま進む未来」「動いた未来」「手放した未来」を無料で占います。",
+    "恋愛・復縁・仕事・人生の迷いに。今の選択から「このまま進む未来・動いた未来・手放した未来」を読み解く無料鑑定。90日後の未来も深掘りできます。",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "未来分岐占い｜今の選択で変わる3つの未来を無料診断",
+    title: "未来分岐占い｜今の選択から3つの未来を無料鑑定",
     description:
-      "恋愛、復縁、仕事、人生の迷いに。生年月日と今の悩みから3つの未来分岐を無料で占います。",
+      "恋愛・復縁・仕事・人生の迷いに。このまま進む未来、動いた未来、手放した未来を無料で鑑定します。",
     images: [{ url: "/og-image.svg", width: 1200, height: 630 }],
   },
 };
@@ -34,30 +34,82 @@ const knowItems = [
 
 const faqItems = [
   {
-    question: "無料でどこまで見られますか？",
-    answer: "運命分岐タイプ、現在地、3つの未来、30日以内のアドバイスまで無料で見られます。",
+    question: "未来分岐占いとは？",
+    answer:
+      "未来分岐占いは、今の選択に対して「このまま進む未来」「動いた未来」「手放した未来」の3つの流れを読み解く占いです。ひとつの答えを決めつけるのではなく、迷いを整理するためのヒントとして楽しめます。",
   },
   {
-    question: "有料鑑定では何が深くなりますか？",
-    answer: "90日後の流れ、動くべき時期、避けたい行動、相手や環境の影響まで詳しく読めます。",
+    question: "無料で占えますか？",
+    answer:
+      "はい。運命分岐タイプ、今の現在地、3つの未来分岐、30日以内のアドバイスまで無料で占えます。登録不要で、スマホからでも利用できます。",
   },
   {
-    question: "登録は必要ですか？",
-    answer: "登録不要で無料鑑定を利用できます。結果URLを保存しておくと、あとから見返せます。",
+    question: "恋愛や復縁も占えますか？",
+    answer:
+      "恋愛、復縁、片思い、連絡するべきか、この恋を続けるべきかなどのテーマに対応しています。仕事や人生の転機、2026年の運勢も鑑定できます。",
   },
   {
-    question: "占い結果は絶対ですか？",
-    answer: "いいえ。未来分岐占いはエンタメ目的の占いです。最終的な判断はご自身で行ってください。",
+    question: "90日後の未来は見られますか？",
+    answer:
+      "無料鑑定では今現れやすい3つの未来を読み解きます。深掘り鑑定では、90日後の未来、動くべき時期、避けたい行動、相手や環境の影響まで詳しく見られます。",
   },
 ];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqItems.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.answer,
+    },
+  })),
+};
 
 export default function Home() {
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <HeroSection />
       <RankingSection />
       <CategoryTabs />
       <FreeTrialSection />
+
+      <section className="bg-[#FFF8EE] px-4 py-12 sm:py-16">
+        <div className="mx-auto max-w-5xl">
+          <p className="section-kicker">Future Branch Reading</p>
+          <h2 className="ornament-title mt-2 text-3xl font-bold leading-tight text-ink">
+            今の選択から、3つの未来を見つめる占い
+          </h2>
+          <div className="mt-6 grid gap-5 text-ink/74 md:grid-cols-3">
+            <div className="fortune-card rounded-lg p-5">
+              <h3 className="font-bold text-ink">このまま進む未来</h3>
+              <p className="mt-3 text-sm leading-7">
+                今の流れを大きく変えずに進んだ場合、恋愛・復縁・仕事・人生の迷いがどの方向へ向かいやすいかを読み解きます。
+              </p>
+            </div>
+            <div className="fortune-card rounded-lg p-5">
+              <h3 className="font-bold text-ink">動いた未来</h3>
+              <p className="mt-3 text-sm leading-7">
+                連絡する、話し合う、転職準備をするなど、あなたが一歩動いたときに起こりやすい変化を見ます。
+              </p>
+            </div>
+            <div className="fortune-card rounded-lg p-5">
+              <h3 className="font-bold text-ink">手放した未来</h3>
+              <p className="mt-3 text-sm leading-7">
+                一度距離を置く、執着をゆるめる、保留することで残るものや軽くなるものを、やさしい言葉で整理します。
+              </p>
+            </div>
+          </div>
+          <p className="mt-6 leading-8 text-ink/72">
+            未来分岐占いは、「今の選択で未来はどう変わるのか」を知りたい人のための無料鑑定です。
+            3つの未来 占い、今の選択 未来 占い、90日後の未来 占いを探している方にも読みやすいよう、
+            無料結果では現在地と短期アドバイスを、深掘り鑑定では90日以内の流れを具体的にお伝えします。
+          </p>
+        </div>
+      </section>
 
       <section className="bg-white px-4 py-12 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">

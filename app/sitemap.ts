@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { seoPages } from "@/lib/fortune-data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
   const now = new Date();
   const staticRoutes = [
     "/",
@@ -12,8 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/disclaimer",
     "/commercial-law",
     "/contact",
-    "/success",
-    "/cancel",
   ];
   const seoRoutes = Object.keys(seoPages).map((slug) => `/pages/${slug}`);
 

@@ -31,6 +31,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  verification: {
+    google: "B_j0fOORjr7utFPIGWgXN5Ez5jWjFWuCigSr1pu_Tl0",
+  },
   openGraph: {
     title: "未来分岐占い｜今の選択で変わる3つの未来を無料診断",
     description:
